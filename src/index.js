@@ -105,6 +105,23 @@ class Game extends React.Component {
     });
   }
 
+  btnMouseEnter(move, event) {
+    if (!this.check_clicked) this.jumpTo(move);
+    this.changeBtnColor(true, event);
+    let btn = "#move" + move + " button";
+    $(btn).on({
+      click: () => {
+        this.jumpTo(move);
+        this.changeBtnColor(false, event);
+        this.check_clicked = true;
+      }, 
+      mouseleave: () => {
+        this.changeBtnColor(false, event);
+        if (!this.check_clicked) this.jumpTo(this.state.history.length - 1);
+      }
+    });
+  }
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
@@ -130,20 +147,7 @@ class Game extends React.Component {
           <li id={"move" + move}>
             <button 
               onMouseEnter={(event) => {
-                if (!this.check_clicked) this.jumpTo(move);
-                this.changeBtnColor(true, event);
-                let btn = "#move" + move + " button";
-                $(btn).on({
-                  click: () => {
-                    this.jumpTo(move);
-                    this.changeBtnColor(false, event);
-                    this.check_clicked = true;
-                  }, 
-                  mouseleave: () => {
-                    this.changeBtnColor(false, event);
-                    if (!this.check_clicked) this.jumpTo(this.state.history.length - 1);
-                  }
-                });
+                this.btnMouseEnter(move, event);
               }}
             >{desc}</button>
           </li>
