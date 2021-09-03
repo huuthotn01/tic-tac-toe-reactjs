@@ -27,7 +27,7 @@ class Board extends React.Component {
   renderSquare(i) {
     let style = {};
     if (this.props.winner) {
-      for (let x = 1; x < 4; x++) if (i === this.props.winner[x]) style = {"backgroundColor": "cyan"};
+      for (let x = 1; x <= 5; x++) if (i === this.props.winner[x]) style = {"backgroundColor": "cyan"};
     } else if (this.props.historyPos === i) style = {"backgroundColor": "red"};
     return (
       <Square
@@ -71,6 +71,7 @@ class Game extends React.Component {
       xIsNext: true,
       endgame: false,
     }
+    this.check_clicked = false; // determine whether time travel state is selected or not
   }
 
   changeBtnColor(over, event) {
@@ -123,23 +124,24 @@ class Game extends React.Component {
         }
         desc = "Go to move #" + move + ": Player " + player + " moved (" + (Math.floor(position / 5)).toString() + ", " + (position % 5).toString() + ")";
       } else desc = "Go to game start";
+
       return (
-        <div  key={move}>
+        <div key={move}>
           <li id={"move" + move}>
             <button 
               onMouseEnter={(event) => {
-                this.jumpTo(move);
+                if (!this.check_clicked) this.jumpTo(move);
                 this.changeBtnColor(true, event);
-                let btn = "#move" + move + ":first-child";
-                let check_clicked = false;
+                let btn = "#move" + move + " button";
                 $(btn).on({
                   click: () => {
+                    this.jumpTo(move);
                     this.changeBtnColor(false, event);
-                    check_clicked = true;
+                    this.check_clicked = true;
                   }, 
                   mouseleave: () => {
                     this.changeBtnColor(false, event);
-                    if (!check_clicked) this.jumpTo(this.state.history.length - 1);
+                    if (!this.check_clicked) this.jumpTo(this.state.history.length - 1);
                   }
                 });
               }}
@@ -190,7 +192,7 @@ function calculateWinner(squares, last_move) {
     [1, 1], // down right
   ];
   for (let i = 0; i < unit_move.length; i++) {
-    let ret_val = [player];
+    let ret_val = [player, last_move];
     let num_point = 1;
     let d;
     for (d = 1; d <= 5; d++) {
