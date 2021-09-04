@@ -24,7 +24,7 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      length: 5, 
+      board_length: this.props.boardLength, 
     }
   }
 
@@ -44,7 +44,7 @@ class Board extends React.Component {
   }
   
   render() {
-    const board_length = this.state.length;
+    const board_length = this.state.board_length;
     let rows = [];
     for (let r = 0; r < board_length; r++) {
       let squares = [];
@@ -71,6 +71,7 @@ class Game extends React.Component {
         squares: Array(9).fill(null),
         move: -1,
       }],
+      board_length: this.props.boardLength,
       stepNumber: 0,
       xIsNext: true,
       endgame: false,
@@ -96,7 +97,7 @@ class Game extends React.Component {
       }]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext, 
-      endgame: (calculateWinner(squares, i) ? true : false),
+      endgame: (calculateWinner(squares, i, this.state.board_length) ? true : false),
     });
   }
 
@@ -129,21 +130,22 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares, current.move);
+    const winner = calculateWinner(current.squares, current.move, this.state.board_length);
 
     let position = -1;
     const move = history.map((step, move) => {
       let desc = "";
       if (move) {
         let player = "";
-        for (let a = 0; a < 25; a++) {
+        for (let a = 0; a < this.state.board_length * this.state.board_length; a++) {
           if (history[move].squares[a] !== history[move - 1].squares[a]) {
             player = history[move].squares[a];
             position = a;
             break;
           }
         }
-        desc = "Go to move #" + move + ": Player " + player + " moved (" + (Math.floor(position / 5)).toString() + ", " + (position % 5).toString() + ")";
+        desc = "Go to move #" + move + ": Player " + player 
+              + " moved (" + (Math.floor(position / this.state.board_length)).toString() + ", " + (position % this.state.board_length).toString() + ")";
       } else desc = "Go to game start";
 
       return (
@@ -162,8 +164,8 @@ class Game extends React.Component {
     });
 
     let status;
-    if (winner) status = 'Winner: ' + (winner[0] === 'X' ? this.props.xName + " (plays X)" : this.props.yName + " (plays O)");
-    else status = 'Next player: ' + (this.state.xIsNext ? this.props.xName + " (plays X)" : this.props.yName + " (plays O)");
+    if (winner) status = 'Winner: ' + (winner[0] === 'X' ? this.props.xName : this.props.oName);
+    else status = 'Next player: ' + (this.state.xIsNext ? this.props.xName + " (plays X)" : this.props.oName + " (plays O)");
     return (
       <Container>
       <div className="game">
@@ -171,6 +173,7 @@ class Game extends React.Component {
           <Board 
             historyPos={this.state.history[this.state.stepNumber].move} // position played at the move
             winner={winner} // determine squares led to victory
+            boardLength={this.state.board_length}
             squares={current.squares}
             onClick={(i) => this.handleClick(i)}
           />
@@ -193,17 +196,17 @@ class StartForm extends React.Component {
     this.state = {
       board_length: 0,
       x_name: "X",
-      y_name: "Y",
+      o_name: "O",
     }
     this.onXChange = this.onXChange.bind(this);
-    this.onYChange = this.onYChange.bind(this);
+    this.onOChange = this.onOChange.bind(this);
     this.onLengthChange = this.onLengthChange.bind(this);
   }
 
   onSubmit(event) {
     event.preventDefault();
     this.props.onNameXChange(this.state.x_name);
-    this.props.onNameYChange(this.state.y_name);
+    this.props.onNameOChange(this.state.o_name);
     this.props.onLengthChange(this.state.board_length);
   }
 
@@ -213,9 +216,9 @@ class StartForm extends React.Component {
     });
   }
 
-  onYChange(event) {
+  onOChange(event) {
     this.setState({
-      y_name: event.target.value,
+      o_name: event.target.value,
     });
   }
 
@@ -235,7 +238,7 @@ class StartForm extends React.Component {
           </Form.Group>
           <Form.Group>
             <Form.Label>Name of player 2 (plays O): </Form.Label>
-            <Form.Control type="text" placeholder="Y" onChange={this.onYChange} />
+            <Form.Control type="text" placeholder="O" onChange={this.onOChange} />
           </Form.Group>
           <Form.Group>
             <Form.Label>Length of board: </Form.Label>
@@ -257,11 +260,11 @@ class HomePage extends React.Component {
     this.state = {
       board_length: 0,
       x_player: "X",
-      y_player: "Y",
+      o_player: "O",
     };
     this.onLengthChange = this.onLengthChange.bind(this);
     this.onNameXChange = this.onNameXChange.bind(this);
-    this.onNameYChange = this.onNameYChange.bind(this);
+    this.onNameOChange = this.onNameOChange.bind(this);
   }
 
   onLengthChange(length) {
@@ -277,9 +280,9 @@ class HomePage extends React.Component {
     });
   }
 
-  onNameYChange(y_name) {
+  onNameOChange(o_name) {
     this.setState({
-      y_player: y_name,
+      o_player: o_name,
     });
   }
 
@@ -288,13 +291,13 @@ class HomePage extends React.Component {
       return <StartForm 
         onLengthChange={this.onLengthChange}
         onNameXChange={this.onNameXChange}
-        onNameYChange={this.onNameYChange}
+        onNameOChange={this.onNameOChange}
       />
     } else {
       return <Game 
         boardLength={this.state.board_length}
         xName={this.state.x_player}
-        yName={this.state.y_player}
+        oName={this.state.o_player}
       />
     }
   }
@@ -309,10 +312,18 @@ ReactDOM.render(
 
 // ===============================================================================================
 
-function calculateWinner(squares, last_move) {
+function calculateWinner(squares, last_move, board_length) {
+  /* TODO */
+  /* 
+    Assume the board is a Oxy coordinate, the most up-left square is the root
+    From the root, down to the most down-left square is Ox, and to the most up-right square is Oy. Position is displayed as (x_pos, y_pos)
+    To determine whether the winner exists, we get the last move from players, because it's the move which leads to victory if winner exists
+    There are at most 8 directions to move for each square, and two opposite ones form a pair of direction. We will iterate through each direction pair 
+    If the iteration indicates there exists at least five consecutive points of the same player, then that player is the winner 
+  */
   const player = squares[last_move];
   if (player == null) return null;
-  const [x_pos, y_pos] = [Math.floor(last_move / 5), last_move % 5];
+  const [x_pos, y_pos] = [Math.floor(last_move / board_length), last_move % board_length];
   const unit_move = [
     [-1, 0], // up
     [-1, 1], // up right
@@ -325,20 +336,20 @@ function calculateWinner(squares, last_move) {
     let d;
     for (d = 1; d <= 5; d++) {
       let [x_dest, y_dest] = [x_pos + unit_move[i][0] * d, y_pos + unit_move[i][1] * d];
-      if (x_dest < 0 || x_dest > 5 || y_dest < 0 || y_dest > 5) continue;
-      if (squares[x_dest * 5 + y_dest] === player) {
+      if (x_dest < 0 || x_dest > board_length || y_dest < 0 || y_dest > board_length) continue;
+      if (squares[x_dest * board_length + y_dest] === player) {
         num_point++;
-        ret_val.push(x_dest * 5 + y_dest);
+        ret_val.push(x_dest * board_length + y_dest);
       }
       else break;
     }
     let r;
     for (r = -1; r >= -5; r--) {
       let [x_dest, y_dest] = [x_pos + unit_move[i][0] * r, y_pos + unit_move[i][1] * r];
-      if (x_dest < 0 || x_dest > 5 || y_dest < 0 || y_dest > 5) continue;
-      if (squares[x_dest * 5 + y_dest] === player) {
+      if (x_dest < 0 || x_dest > board_length || y_dest < 0 || y_dest > board_length) continue;
+      if (squares[x_dest * board_length + y_dest] === player) {
         num_point++;
-        ret_val.push(x_dest * 5 + y_dest);
+        ret_val.push(x_dest * board_length + y_dest);
       }
       else break;
     }
