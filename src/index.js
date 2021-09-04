@@ -168,21 +168,21 @@ class Game extends React.Component {
     else status = 'Next player: ' + (this.state.xIsNext ? this.props.xName + " (plays X)" : this.props.oName + " (plays O)");
     return (
       <Container>
-      <div className="game">
-        <div className="game-board">
-          <Board 
-            historyPos={this.state.history[this.state.stepNumber].move} // position played at the move
-            winner={winner} // determine squares led to victory
-            boardLength={this.state.board_length}
-            squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
-          />
+        <div className="game">
+          <div className="game-board">
+            <Board 
+              historyPos={this.state.history[this.state.stepNumber].move} // position played at the move
+              winner={winner} // determine squares led to victory
+              boardLength={this.state.board_length}
+              squares={current.squares}
+              onClick={(i) => this.handleClick(i)}
+            />
+          </div>
+          <div className="game-info">
+            <Form.Label>{status}</Form.Label>
+            <ol>{move}</ol>
+          </div>
         </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol>{move}</ol>
-        </div>
-      </div>
       </Container>
     );
   }

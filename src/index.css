@@ -42,7 +42,7 @@ body {
   
   .game {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
   }
   
   .game-info {
