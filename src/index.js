@@ -1,7 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import $ from 'jquery'
+import $ from 'jquery';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form'
+import { Container } from 'react-bootstrap';
 
 function Square(props) {
   return (
@@ -75,8 +79,8 @@ class Game extends React.Component {
   }
 
   changeBtnColor(over, event) {
-    if (over) event.target.style.backgroundColor = "cyan";
-    else event.target.style.backgroundColor = "rgb(239, 239, 239)";
+    if (over) event.target.variant = "info";
+    else event.target.variant = "light";
   }
 
   handleClick(i) {
@@ -145,11 +149,12 @@ class Game extends React.Component {
       return (
         <div key={move}>
           <li id={"move" + move}>
-            <button 
+            <Button 
+              variant="outline-success" 
               onMouseEnter={(event) => {
                 this.btnMouseEnter(move, event);
               }}
-            >{desc}</button>
+            >{desc}</Button>
           </li>
           <br />
         </div>
@@ -157,9 +162,10 @@ class Game extends React.Component {
     });
 
     let status;
-    if (winner) status = 'Winner: ' + winner[0];
-    else status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+    if (winner) status = 'Winner: ' + (winner[0] === 'X' ? this.props.xName + " (plays X)" : this.props.yName + " (plays O)");
+    else status = 'Next player: ' + (this.state.xIsNext ? this.props.xName + " (plays X)" : this.props.yName + " (plays O)");
     return (
+      <Container>
       <div className="game">
         <div className="game-board">
           <Board 
@@ -174,16 +180,134 @@ class Game extends React.Component {
           <ol>{move}</ol>
         </div>
       </div>
+      </Container>
     );
   }
 }
+
+// ==================================================================================================
+
+class StartForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      board_length: 0,
+      x_name: "X",
+      y_name: "Y",
+    }
+    this.onXChange = this.onXChange.bind(this);
+    this.onYChange = this.onYChange.bind(this);
+    this.onLengthChange = this.onLengthChange.bind(this);
+  }
+
+  onSubmit(event) {
+    event.preventDefault();
+    this.props.onNameXChange(this.state.x_name);
+    this.props.onNameYChange(this.state.y_name);
+    this.props.onLengthChange(this.state.board_length);
+  }
+
+  onXChange(event) {
+    this.setState({
+      x_name: event.target.value,
+    });
+  }
+
+  onYChange(event) {
+    this.setState({
+      y_name: event.target.value,
+    });
+  }
+
+  onLengthChange(event) {
+    this.setState({
+      board_length: event.target.value,
+    });
+  }
+
+  render() {
+    return (
+      <Container>
+        <Form onSubmit={(event) => this.onSubmit(event)} >
+          <Form.Group>
+            <Form.Label>Name of player 1 (plays X): </Form.Label>
+            <Form.Control type="text" placeholder="X" onChange={this.onXChange} />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Name of player 2 (plays O): </Form.Label>
+            <Form.Control type="text" placeholder="Y" onChange={this.onYChange} />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Length of board: </Form.Label>
+            <Form.Control type="number" min="5" onChange={this.onLengthChange} />
+          </Form.Group>
+          <br />
+          <Button variant="primary" type="submit" >
+            Submit
+          </Button>
+        </Form>
+      </Container>
+    );
+  }
+}
+
+class HomePage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      board_length: 0,
+      x_player: "X",
+      y_player: "Y",
+    };
+    this.onLengthChange = this.onLengthChange.bind(this);
+    this.onNameXChange = this.onNameXChange.bind(this);
+    this.onNameYChange = this.onNameYChange.bind(this);
+  }
+
+  onLengthChange(length) {
+    if (length < 5) return;
+    this.setState({
+      board_length: length,
+    });
+  }
+
+  onNameXChange(x_name) {
+    this.setState({
+      x_player: x_name,
+    });
+  }
+
+  onNameYChange(y_name) {
+    this.setState({
+      y_player: y_name,
+    });
+  }
+
+  render() {
+    if (this.state.board_length === 0) {
+      return <StartForm 
+        onLengthChange={this.onLengthChange}
+        onNameXChange={this.onNameXChange}
+        onNameYChange={this.onNameYChange}
+      />
+    } else {
+      return <Game 
+        boardLength={this.state.board_length}
+        xName={this.state.x_player}
+        yName={this.state.y_player}
+      />
+    }
+  }
+}
   
-// ========================================
+// ===============================================================================================
   
 ReactDOM.render(
-  <Game />,
+  <HomePage />,
   document.getElementById('root')
 );  
+
+// ===============================================================================================
 
 function calculateWinner(squares, last_move) {
   const player = squares[last_move];
