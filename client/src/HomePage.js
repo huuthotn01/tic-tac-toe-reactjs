@@ -1,6 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
+import './HomePage.css';
 import $ from 'jquery';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
@@ -304,13 +303,6 @@ class HomePage extends React.Component {
 }
   
 // ===============================================================================================
-  
-ReactDOM.render(
-  <HomePage />,
-  document.getElementById('root')
-);  
-
-// ===============================================================================================
 
 function calculateWinner(squares, last_move, board_length) {
   /* TODO */
@@ -357,3 +349,5 @@ function calculateWinner(squares, last_move, board_length) {
   }
   return null;
 }
+
+export { HomePage };
