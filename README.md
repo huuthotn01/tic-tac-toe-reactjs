@@ -1,10 +1,32 @@
-# Getting Started with Create React App
+# Getting Started with React
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is made to learn React, Node and Express.
+
+## What's inside
+
+The server is built by Node and its framework Express. The frontend is built by React and stored in `client` directory. Dependencies and other infos are declared in the json files. In addition to default modules, the app also use JQuery, Bootstrap and React-bootstrap. To download these modules, navigate to `client` directory and run `npm` commands.
+
+`cd client`
+
+`npm install jquery --save` 
+
+`npm install react-bootstrap bootstrap --save`
+
+The modules will be automatically written into the [package.json](package.json) file.
 
 ## Available Scripts
 
-In the project directory, you can run:
+In the project root directory, you can run:
+
+### `node server.js`
+
+The server is built in file `server.js`. Run the above command to open the server and receive request from client. Without this command the app won't work. Now the server will listen at port 5000. Open [http://localhost:5000](http://localhost:5000/express_backend) to see the result.
+
+After that, navigate to `client` directory:
+
+`cd client`
+
+and you can run these commands:
 
 ### `npm start`
 
@@ -25,9 +47,6 @@ Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 ### `npm run eject`
 
@@ -39,32 +58,4 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
 ### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
