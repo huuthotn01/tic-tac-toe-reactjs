@@ -2,13 +2,16 @@ import React, { Component} from 'react';
 import { HomePage } from './HomePage.js';
 
 class App extends Component {
-  state = {
-    data: null,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      isOK: false,
+    };
+  }
 
   componentDidMount() {
     this.callBackendAPI()
-        .then(res => this.setState({data: res.express}))
+        .then(res => this.setState({isOK: res.check_status}))
         .catch(err => console.log(err)); 
   }
 
@@ -17,15 +20,21 @@ class App extends Component {
     const body = await response.json();
 
     if (response.status !== 200) {
-      throw Error(body.message);
+      throw Error("Error");
     }
     return body;
   };
 
   render() {
-    return (
-      <HomePage />
-    );
+    if (this.state.isOK) {
+      return (
+        <HomePage />
+      );
+    } else {
+      return (
+        <h1>Error occurred, try again!</h1>
+      );
+    }
   }
 }
 
